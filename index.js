@@ -5,7 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 require('dotenv/config');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5050;
 app.use(cors(corsOptions));
 
 const LocationRoutes = require('./routes/location');
