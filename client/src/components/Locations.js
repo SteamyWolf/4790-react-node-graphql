@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { TextField, Button, Card, CardActionArea, Typography, CardContent, List, ListItem, ListItemAvatar, Avatar, ListItemText, CardActions, IconButton, CardMedia } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, gql, useMutation } from '@apollo/client';
 import MapGoogle from './MapGoogle';
 
 const useStyles = makeStyles((theme) => ({
@@ -15,6 +15,9 @@ const useStyles = makeStyles((theme) => ({
         width: '300px',
         margin: '0 auto',
         marginTop: 30,
+        position: 'relative'
+    },
+    cardContent: {
         position: 'relative'
     },
     editIcon: {
@@ -59,85 +62,163 @@ const ALL_LOCATIONS = gql`
     }
 `
 
+const UPDATE_COORDINATE = gql`
+    mutation updateCoordinate($id: Int!) {
+        updateCoordinate(id: $Int) {
+            id
+            latitude
+            longitude
+        }
+    }
+`
 
 
 
 const Locations = () => {
     const classes = useStyles();
-    // const [locations, setLocations] = useState([]);
+    const [locations, setLocations] = useState([]);
+    // const [editingLocation, setEditingLocation] = useState(null);
+    const [updateCoor, { dataMutation }] = useMutation(UPDATE_COORDINATE);
 
     const { loading, error, data } = useQuery(ALL_LOCATIONS)
-
     if (loading) {
         console.log('Currently Loading', loading)
     }
-
     if (error) {
         console.log('error', error)
     }
-    
-    let locations = [];
-    if (!loading) {
-        locations = data.allLocations;
-        console.log(locations)
-        locations.map(location => {
-            return {
-                ...location,
-                data: 'hi'
-            }
-        })
+    // let locations = [];
+    const locationsState = (bool) => {
+        if (!bool) {
+            // locations = data.allLocations;
+            let allLocationMapped = data.allLocations.map(location => {
+                return { ...location, editing: false}
+            })
+            setLocations(allLocationMapped)
+            
+            console.log(locations)
+        }
+    }
+    useEffect(() => {
+        locationsState(loading);
+    }, [loading])
+
+
+
+
+
+    const onEditClick = (location) => {
+        console.log(location)
+        console.log('clicked onEdit')
+        let foundLocation = locations.find(loc => loc.id === location.id);
+        // setEditingLocation(foundLocation);
+        foundLocation.editing = !foundLocation.editing;
+        let index = locations.findIndex(element => element.id === foundLocation.id)
+        let newLocationData = [...locations];
+        newLocationData.splice(index, 1, foundLocation);
+        setLocations(newLocationData);
     }
 
-    const onEditClick = () => {
-        console.log('clicked onEdit')
+    const saveButtonClick = (event, location) => {
+        // setEditingLocation(location);
+        location.editing = false;
+        event.preventDefault();
+        const formData = new FormData(event.target)
+        const formArray = [];
+        for (let [key, value] of formData.entries()) {
+            if (key === 'latitude') {
+                let obj = { latitude: value }
+                formArray.push(obj);
+            } else if (key === 'longitude') {
+                let obj = { longitude: value }
+                formArray.push(obj)
+            } else {
+                console.log('other included', key, value)
+            }
+        }
+        const newArray = [];
+        for (let i = 0; i < formArray.length; i++) {
+            let coorID = event.target[i].attributes[2].value
+            newArray.push({...formArray[i], id: coorID})
+        }
+
+        const newLocation = {...location};
+        const findingsArr = [];
+        newLocation.coordinates.forEach(coor => {
+            let finding = newArray.filter(obj => coor.id === parseInt(obj.id))
+            let control = {...finding[0], ...finding[1]}
+            findingsArr.push(control)
+        })
+        const anotherArr = findingsArr.map(obj => {
+            return {...obj, id: parseInt(obj.id)}
+        })
+        const completedLocation = {...location, coordinates: anotherArr}
+        console.log(completedLocation);
+
+        let index = locations.findIndex(loc => loc.id === completedLocation.id)
+        let newLocations = [...locations];
+        newLocations.splice(index, 1, completedLocation);
+        setLocations(newLocations);
     }
 
 
     return (
         <>
         {locations.length === 0 ?
-            <div>Loading Data</div>
+            <div>Loading Data...</div>
         : 
             <div className={classes.locationsMain}>
                 {locations.map(location => {
                     return (
                         <Card className={classes.card} key={location.id}>
                             <CardActionArea>
-                                <div>
+                                <CardMedia>
                                     <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places`} //&key=${process.env.REACT_APP_GOOGLE_KEY}
                                                location={location} 
                                                loadingElement={<div style={{ height: `100%` }} />}
                                                containerElement={<div style={{ height: `400px` }} />} 
                                                mapElement={<div style={{ height: `100%` }} />}
                                     />
-                                </div>
-                                <CardContent>
+                                </CardMedia>
+                                <CardContent className={classes.cardContent}>
                                     <Typography gutterBottom variant="h5" comppnent="h2">
                                         {location.name}
                                     </Typography>
                                     <Typography>
                                         {location.description}
                                     </Typography>
-                                    {location.coordinates.map(coordinate => {
-                                        return (
-                                            <Typography variant="body2" color="textSecondary" component="div" key={coordinate.id}>
-                                                <p>Longitude: {coordinate.longitude}</p>
-                                                <p>Latitude: {coordinate.latitude}</p>
-                                                <hr></hr>
-                                            </Typography>
-                                        )
-                                    })}
+                                        <form onSubmit={(e) => saveButtonClick(e, location)}>
+                                            {location.coordinates.map(coordinate => {
+                                                return (
+                                                    <Typography variant="body2" color="textSecondary" component="div" key={coordinate.id}>
+                                                        <div>Latitude: { !location.editing ? coordinate.latitude : <input type="text" name="latitude" data={coordinate.id} defaultValue={coordinate.latitude} /> }</div>
+                                                        <div>Longitude: {!location.editing ? coordinate.longitude : <input type="text" name="longitude" data={coordinate.id} defaultValue={coordinate.longitude} />}</div>
+                                                        <hr></hr>
+                                                    </Typography>
+                                                )
+                                            })}
+                                            {location.editing 
+                                                ?
+                                                    <div>
+                                                        <Button color="primary" variant="contained" type="submit">Save</Button>
+                                                        <Button variant="contained" onClick={() => onEditClick(location)}>Cancel</Button>
+                                                    </div>
+                                                :
+                                                    null
+                                            }
+                                        </form>
+                                    <IconButton className={classes.editIcon} onClick={() => onEditClick(location)}>
+                                        <EditIcon />
+                                    </IconButton>
                                 </CardContent>
                             </CardActionArea>
                             <CardActions>
-                                <IconButton className={classes.editIcon} onClick={() => onEditClick()}>
-                                    <EditIcon />
-                                </IconButton>
+                                
+                                
                             </CardActions>
                         </Card>
                     )
                 })}
-                
             </div>
         }
         </>
