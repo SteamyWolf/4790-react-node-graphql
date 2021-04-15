@@ -63,8 +63,8 @@ const ALL_LOCATIONS = gql`
 `
 
 const UPDATE_COORDINATE = gql`
-    mutation updateCoordinate($id: Int!, $longitude: String!, $latitude: String!) {
-        updateCoordinate(id: $Int, longitude: $String, latitude: $String) {
+    mutation updateCoordinate($id: Int!, $data: CoordinateCreateInput!) {
+        updateCoordinate(id: $id, data: $data) {
             id
             latitude
             longitude
@@ -143,7 +143,7 @@ const Locations = () => {
         })
         console.log(organizedArr)
         organizedArr.forEach(coordinate => {
-            updateCoor({variables: { id: coordinate.id, longitude: coordinate.longitude, latitude: coordinate.latitude } })
+            updateCoor({variables: { id: coordinate.id, data: {longitude: coordinate.longitude, latitude: coordinate.latitude}}})
         })
 
         const completedLocation = {...location, coordinates: organizedArr}
