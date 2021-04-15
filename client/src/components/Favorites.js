@@ -55,6 +55,7 @@ const Favorites = () => {
     const classes = useStyles();
     const [ipAddressData, setIpAddressData] = useState([])
     const [loading, setLoading] = useState(false);
+    const [mainLoading, setMainLoading] = useState(false)
     const [editingFavorite, setEditingFavorite] = useState(
         {
             ip: '',
@@ -68,9 +69,11 @@ const Favorites = () => {
 
     const fetchFavorites = async () => {
         try {
+            setMainLoading(true);
             const fetchedFavorites = await axios.get('https://ip-address-app-wyatt.herokuapp.com/location/favorites')
             let mappedFavorites = fetchedFavorites.data.map(favorite => ({editing: false, ...favorite}))
             setIpAddressData(mappedFavorites)
+            setMainLoading(false);
         } catch (err) {
             console.log(err)
         }
@@ -136,7 +139,7 @@ const Favorites = () => {
 
     return (
         <>
-        {loading ?
+        {mainLoading ?
             <div className="test">
                 <CircularProgress />
             </div>

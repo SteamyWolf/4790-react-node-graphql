@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { TextField, Button, Card, CardActionArea, Typography, CardContent, List, ListItem, ListItemAvatar, Avatar, ListItemText, CardActions, IconButton, CardMedia } from '@material-ui/core';
+import { Button, Card, CardActionArea, Typography, CardContent, CardActions, IconButton, CardMedia } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import MapGoogle from './MapGoogle';
