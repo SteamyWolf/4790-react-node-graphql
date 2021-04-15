@@ -33,6 +33,9 @@ const Header = (props) => {
                     <Button>
                         <Link to="/favorites" className={classes.button}>Favorites</Link>
                     </Button>
+                    <Button>
+                        <Link to="/locations" className={classes.button}>Locations</Link>
+                    </Button>
                 </Toolbar>
             </AppBar>
         </div>
