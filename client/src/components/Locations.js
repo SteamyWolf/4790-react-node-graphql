@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { TextField, Button, Card, CardActionArea, Typography, CardContent, List, ListItem, ListItemAvatar, Avatar, ListItemText, CardActions, IconButton, CardMedia } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import { useQuery, gql } from '@apollo/client';
+import MapGoogle from './MapGoogle';
 
 const useStyles = makeStyles((theme) => ({
     locationsMain: {
@@ -50,6 +51,7 @@ const ALL_LOCATIONS = gql`
             name
             description
             coordinates {
+              id
               longitude
               latitude
             }
@@ -57,9 +59,12 @@ const ALL_LOCATIONS = gql`
     }
 `
 
+
+
+
 const Locations = () => {
     const classes = useStyles();
-
+    // const [locations, setLocations] = useState([]);
 
     const { loading, error, data } = useQuery(ALL_LOCATIONS)
 
@@ -70,9 +75,18 @@ const Locations = () => {
     if (error) {
         console.log('error', error)
     }
-
-    const locationList = data.allLocations;
-    console.log(locationList)
+    
+    let locations = [];
+    if (!loading) {
+        locations = data.allLocations;
+        console.log(locations)
+        locations.map(location => {
+            return {
+                ...location,
+                data: 'hi'
+            }
+        })
+    }
 
     const onEditClick = () => {
         console.log('clicked onEdit')
@@ -81,12 +95,22 @@ const Locations = () => {
 
     return (
         <>
+        {locations.length === 0 ?
+            <div>Loading Data</div>
+        : 
             <div className={classes.locationsMain}>
-                {locationList.map(location => {
+                {locations.map(location => {
                     return (
                         <Card className={classes.card} key={location.id}>
                             <CardActionArea>
-                                <CardMedia />
+                                <div>
+                                    <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places`} //&key=${process.env.REACT_APP_GOOGLE_KEY}
+                                               location={location} 
+                                               loadingElement={<div style={{ height: `100%` }} />}
+                                               containerElement={<div style={{ height: `400px` }} />} 
+                                               mapElement={<div style={{ height: `100%` }} />}
+                                    />
+                                </div>
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" comppnent="h2">
                                         {location.name}
@@ -96,14 +120,13 @@ const Locations = () => {
                                     </Typography>
                                     {location.coordinates.map(coordinate => {
                                         return (
-                                            <Typography variant="body2" color="textSecondary" component="div">
-                                                <p>{coordinate.longitude}</p>
-                                                <p>{coordinate.latitude}</p>
+                                            <Typography variant="body2" color="textSecondary" component="div" key={coordinate.id}>
+                                                <p>Longitude: {coordinate.longitude}</p>
+                                                <p>Latitude: {coordinate.latitude}</p>
                                                 <hr></hr>
                                             </Typography>
                                         )
                                     })}
-                                    
                                 </CardContent>
                             </CardActionArea>
                             <CardActions>
@@ -116,6 +139,7 @@ const Locations = () => {
                 })}
                 
             </div>
+        }
         </>
     )
 }
