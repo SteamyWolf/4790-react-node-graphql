@@ -63,8 +63,8 @@ const ALL_LOCATIONS = gql`
 `
 
 const UPDATE_COORDINATE = gql`
-    mutation updateCoordinate($id: Int!) {
-        updateCoordinate(id: $Int) {
+    mutation updateCoordinate($id: Int!, $longitude: String!, $latitude: String!) {
+        updateCoordinate(id: $Int, longitude: $String, latitude: $String) {
             id
             latitude
             longitude
@@ -77,7 +77,6 @@ const UPDATE_COORDINATE = gql`
 const Locations = () => {
     const classes = useStyles();
     const [locations, setLocations] = useState([]);
-    // const [editingLocation, setEditingLocation] = useState(null);
     const [updateCoor, { dataMutation }] = useMutation(UPDATE_COORDINATE);
 
     const { loading, error, data } = useQuery(ALL_LOCATIONS)
@@ -87,15 +86,12 @@ const Locations = () => {
     if (error) {
         console.log('error', error)
     }
-    // let locations = [];
     const locationsState = (bool) => {
         if (!bool) {
-            // locations = data.allLocations;
             let allLocationMapped = data.allLocations.map(location => {
                 return { ...location, editing: false}
             })
             setLocations(allLocationMapped)
-            
             console.log(locations)
         }
     }
@@ -103,15 +99,10 @@ const Locations = () => {
         locationsState(loading);
     }, [loading])
 
-
-
-
-
     const onEditClick = (location) => {
         console.log(location)
         console.log('clicked onEdit')
         let foundLocation = locations.find(loc => loc.id === location.id);
-        // setEditingLocation(foundLocation);
         foundLocation.editing = !foundLocation.editing;
         let index = locations.findIndex(element => element.id === foundLocation.id)
         let newLocationData = [...locations];
@@ -120,9 +111,8 @@ const Locations = () => {
     }
 
     const saveButtonClick = (event, location) => {
-        // setEditingLocation(location);
-        location.editing = false;
         event.preventDefault();
+        location.editing = false;
         const formData = new FormData(event.target)
         const formArray = [];
         for (let [key, value] of formData.entries()) {
@@ -132,8 +122,6 @@ const Locations = () => {
             } else if (key === 'longitude') {
                 let obj = { longitude: value }
                 formArray.push(obj)
-            } else {
-                console.log('other included', key, value)
             }
         }
         const newArray = [];
@@ -149,12 +137,16 @@ const Locations = () => {
             let control = {...finding[0], ...finding[1]}
             findingsArr.push(control)
         })
-        const anotherArr = findingsArr.map(obj => {
+
+        const organizedArr = findingsArr.map(obj => {
             return {...obj, id: parseInt(obj.id)}
         })
-        const completedLocation = {...location, coordinates: anotherArr}
-        console.log(completedLocation);
+        console.log(organizedArr)
+        organizedArr.forEach(coordinate => {
+            updateCoor({variables: { id: coordinate.id, longitude: coordinate.longitude, latitude: coordinate.latitude } })
+        })
 
+        const completedLocation = {...location, coordinates: organizedArr}
         let index = locations.findIndex(loc => loc.id === completedLocation.id)
         let newLocations = [...locations];
         newLocations.splice(index, 1, completedLocation);
