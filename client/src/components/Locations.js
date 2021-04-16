@@ -12,9 +12,8 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-evenly'
     },
     card: {
-        width: '300px',
-        margin: '0 auto',
-        marginTop: 30,
+        width: '400px',
+        margin: '30px 20px',
         position: 'relative'
     },
     cardContent: {
@@ -145,6 +144,8 @@ const Locations = () => {
         organizedArr.forEach(coordinate => {
             updateCoor({variables: { id: coordinate.id, data: {longitude: coordinate.longitude, latitude: coordinate.latitude}}})
         })
+
+        locationsState(false);
 
         const completedLocation = {...location, coordinates: organizedArr}
         let index = locations.findIndex(loc => loc.id === completedLocation.id)
