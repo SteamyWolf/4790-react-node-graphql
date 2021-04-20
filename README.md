@@ -1,5 +1,11 @@
-# Accessing this server
-This server is currently running on heroku at https://ip-address-app-wyatt.herokuapp.com. All requests can be sent there as detailed below:
+# First Time Users Start Here:
+This project contains different servers. For now, 3 of the servers will run locally on your machine and 1 is via heroku at: https://ip-address-app-wyatt.herokuapp.com.
+
+All of the scripts to run this project are located in the package.json file located on the `root` level of the project.
+
+First, to start this project you will:
+1. ## `NPM INSTALL`
+
 
 # REQUESTS:
 There are multiple requests this api will bring back to you. You can Create, Read, Update, and Delete with this API as it is pushing data onto a database and retrieving it. Use the following requests to manipulate the data:
