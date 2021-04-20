@@ -5,6 +5,7 @@ const MapGoogle = withScriptjs(
   withGoogleMap(({location}) => {
     return (
       <GoogleMap
+        key={location.coordinates[0].latitude}
         defaultZoom={location.coordinates.length === 0 ? 1 : 10}
         defaultCenter={{
           lat: parseFloat(location.coordinates.length === 0 ? 1 : location.coordinates[0].latitude),

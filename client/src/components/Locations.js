@@ -271,7 +271,7 @@ const Locations = () => {
                                 </CardContent>
                             </CardActionArea>
                             <CardActions>
-                                <div class={classes.deleteIconDiv}>
+                                <div className={classes.deleteIconDiv}>
                                     <DeleteIcon onClick={() => onDeleteLocation(location)} />
                                 </div>
                             </CardActions>
