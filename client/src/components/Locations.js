@@ -196,6 +196,8 @@ const Locations = () => {
             Promise.all(allCoordsDeleted).then(values => {
                 deleteLoc({variables: { id: location.id }})
             }) 
+        } else {
+            deleteLoc({variables: { id: location.id }})
         }
         
         let index = locations.findIndex(loc => loc.id === location.id)
