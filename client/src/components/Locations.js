@@ -201,8 +201,6 @@ const Locations = () => {
         let newLocations = [...locations];
         newLocations.splice(index, 1);
         setLocations(newLocations)
-
-        // 
     }
 
 
