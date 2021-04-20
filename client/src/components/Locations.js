@@ -4,6 +4,7 @@ import { Button, Card, CardActionArea, Typography, CardContent, CardActions, Ico
 import EditIcon from '@material-ui/icons/Edit';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import MapGoogle from './MapGoogle';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme) => ({
     locationsMain: {
@@ -43,6 +44,15 @@ const useStyles = makeStyles((theme) => ({
     textFieldCenter: {
         display: 'flex',
         alignItems: 'center'
+    },
+    deleteIconDiv: {
+        position: 'absolute',
+        right: 10,
+        bottom: 4,
+        cursor: 'pointer'
+    },
+    actionArea: {
+        position: 'relative'
     }
 }));
 
@@ -71,12 +81,33 @@ const UPDATE_COORDINATE = gql`
     }
 `
 
+const DELETE_LOCATION = gql`
+    mutation deleteLocation($id: Int!) {
+        deleteLocation(id: $id) {
+            id
+            name
+        }
+    }
+`
+
+const DELETE_COORDINATE = gql`
+    mutation deleteCoordinate($id: Int!) {
+        deleteCoordinate(id: $id) {
+            id
+            latitude
+            longitude
+        }
+    }
+`
+
 
 
 const Locations = () => {
     const classes = useStyles();
     const [locations, setLocations] = useState([]);
-    const [updateCoor, { dataMutation }] = useMutation(UPDATE_COORDINATE);
+    const [updateCoor] = useMutation(UPDATE_COORDINATE);
+    const [deleteLoc] = useMutation(DELETE_LOCATION);
+    const [deleteCoord] = useMutation(DELETE_COORDINATE);
 
     const { loading, error, data } = useQuery(ALL_LOCATIONS)
     if (loading) {
@@ -111,6 +142,9 @@ const Locations = () => {
 
     const saveButtonClick = (event, location) => {
         event.preventDefault();
+        if (location.coordinates.length === 0) {
+            console.log(event)
+        }
         location.editing = false;
         const formData = new FormData(event.target)
         const formArray = [];
@@ -154,6 +188,24 @@ const Locations = () => {
         setLocations(newLocations);
     }
 
+    const onDeleteLocation = (location) => {
+        if (location.coordinates.length > 0) {
+            let allCoordsDeleted = location.coordinates.map(coor => {
+                return deleteCoord({variables: { id: coor.id }})
+            })
+            Promise.all(allCoordsDeleted).then(values => {
+                deleteLoc({variables: { id: location.id }})
+            }) 
+        }
+        
+        let index = locations.findIndex(loc => loc.id === location.id)
+        let newLocations = [...locations];
+        newLocations.splice(index, 1);
+        setLocations(newLocations)
+
+        // 
+    }
+
 
     return (
         <>
@@ -166,7 +218,7 @@ const Locations = () => {
                         <Card className={classes.card} key={location.id}>
                             <CardActionArea>
                                 <CardMedia>
-                                    <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places`} //&key=${process.env.REACT_APP_GOOGLE_KEY}
+                                    <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key`} //=${process.env.REACT_APP_GOOGLE_KEY}
                                                location={location} 
                                                loadingElement={<div style={{ height: `100%` }} />}
                                                containerElement={<div style={{ height: `400px` }} />} 
@@ -181,15 +233,24 @@ const Locations = () => {
                                         {location.description}
                                     </Typography>
                                         <form onSubmit={(e) => saveButtonClick(e, location)}>
-                                            {location.coordinates.map(coordinate => {
-                                                return (
-                                                    <Typography variant="body2" color="textSecondary" component="div" key={coordinate.id}>
-                                                        <div>Latitude: { !location.editing ? coordinate.latitude : <input type="text" name="latitude" data={coordinate.id} defaultValue={coordinate.latitude} /> }</div>
-                                                        <div>Longitude: {!location.editing ? coordinate.longitude : <input type="text" name="longitude" data={coordinate.id} defaultValue={coordinate.longitude} />}</div>
-                                                        <hr></hr>
-                                                    </Typography>
-                                                )
-                                            })}
+                                            {location.coordinates.length === 0 
+                                                ? 
+                                                    // <Typography variant="body2" color="textSecondary" component="div">
+                                                    //     <div>Latitude: {!location.editing ? 1 : <input type="text" name="latitude" data={Math.round(Math.random() * 1000)} defaultValue={1} />}</div>
+                                                    //     <div>Longitude: {!location.editing ? 1 : <input type="text" name="latitude" data={Math.round(Math.random() * 1000)} defaultValue={1} />}</div>
+                                                    // </Typography> 
+                                                    <p>You must add a coordinate to display the map correctly.{<br></br>} (In progress)</p>
+                                                : 
+                                                    location.coordinates.map(coordinate => {
+                                                        return (
+                                                            <Typography variant="body2" color="textSecondary" component="div" key={coordinate.id}>
+                                                                <div>Latitude: { !location.editing ? coordinate.latitude : <input type="text" name="latitude" data={coordinate.id} defaultValue={coordinate.latitude} /> }</div>
+                                                                <div>Longitude: {!location.editing ? coordinate.longitude : <input type="text" name="longitude" data={coordinate.id} defaultValue={coordinate.longitude} />}</div>
+                                                                <hr></hr>
+                                                            </Typography>
+                                                        )
+                                                    })
+                                            }
                                             {location.editing 
                                                 ?
                                                     <div>
@@ -200,14 +261,17 @@ const Locations = () => {
                                                     null
                                             }
                                         </form>
-                                    <IconButton className={classes.editIcon} onClick={() => onEditClick(location)}>
-                                        <EditIcon />
-                                    </IconButton>
+                                    {location.coordinates.length === 0 ? null : 
+                                        <IconButton className={classes.editIcon} onClick={() => onEditClick(location)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    }
                                 </CardContent>
                             </CardActionArea>
                             <CardActions>
-                                
-                                
+                                <div class={classes.deleteIconDiv}>
+                                    <DeleteIcon onClick={() => onDeleteLocation(location)} />
+                                </div>
                             </CardActions>
                         </Card>
                     )

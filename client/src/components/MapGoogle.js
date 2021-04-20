@@ -5,10 +5,10 @@ const MapGoogle = withScriptjs(
   withGoogleMap(({location}) => {
     return (
       <GoogleMap
-        defaultZoom={10}
+        defaultZoom={location.coordinates.length === 0 ? 1 : 10}
         defaultCenter={{
-          lat: parseFloat(location.coordinates[0].latitude),
-          lng: parseFloat(location.coordinates[0].longitude)
+          lat: parseFloat(location.coordinates.length === 0 ? 1 : location.coordinates[0].latitude),
+          lng: parseFloat(location.coordinates.length === 0 ? 1 : location.coordinates[0].longitude)
         }}
       />
     );
