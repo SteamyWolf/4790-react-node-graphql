@@ -31,7 +31,7 @@ router.get('/:ip', async (req, res, next) => {
 The above request takes in the ip typed in by the user as a request parameter and then performs another request to an api called: `ip-api.com`. This double request responds with data sent back to the client as JSON.
 (This uses a package called: `node-fetch` which allows for fetching within a node application).
 
-# 1st POST Request:
+### 1st POST Request:
 Called after a user clicks on the star icon to favorite an IP Address:
 ```javascript
 router.post('/saveLocation', async (req, res, next) => {
@@ -100,8 +100,8 @@ router.delete('/delete/:id', async (req, res, next) => {
 ```
 Deletes the IP by doing `findByIdAndDelete` using `Mongoose` with the paramater ID sent in via url.
 
-# Locations Page
-(Thor: You should have gotten the API Key comment when I submitted this in Canvas. Uncomment the API key located in `Locations.js line 220` and paste it after the `=` to replace where the call is made to PROCESS.env.REACT_APP_GOOGLE_KEY. I will be deleting the comment once you have finished grading).
+# Locations Page:
+*(Thor: You should have gotten the API Key comment when I submitted this in Canvas. Uncomment the API key located in `Locations.js line 220` and paste it after the `=` to replace where the call is made to PROCESS.env.REACT_APP_GOOGLE_KEY. I will be deleting the comment once you have finished grading).*
 
 On this page, each card has its own Google Map that is zoomed in to the latitude/longitude provided. The map is updated upon changing the latitude of the first coordinate in the list if it contains more than one. The Google Map is showing the coordinates of the first coordinate in the list beneath the map.
 
