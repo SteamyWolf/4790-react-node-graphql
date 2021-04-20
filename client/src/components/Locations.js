@@ -110,9 +110,6 @@ const Locations = () => {
     const [deleteCoord] = useMutation(DELETE_COORDINATE);
 
     const { loading, error, data } = useQuery(ALL_LOCATIONS)
-    if (loading) {
-        console.log('Currently Loading', loading)
-    }
     if (error) {
         console.log('error', error)
     }
@@ -220,7 +217,7 @@ const Locations = () => {
                         <Card className={classes.card} key={location.id}>
                             <CardActionArea>
                                 <CardMedia>
-                                    <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key`} //=${process.env.REACT_APP_GOOGLE_KEY}
+                                    <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`} //
                                                location={location} 
                                                loadingElement={<div style={{ height: `100%` }} />}
                                                containerElement={<div style={{ height: `400px` }} />} 
