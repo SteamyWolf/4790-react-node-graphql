@@ -101,7 +101,7 @@ router.delete('/delete/:id', async (req, res, next) => {
 Deletes the IP by doing `findByIdAndDelete` using `Mongoose` with the paramater ID sent in via url.
 
 # Locations Page:
-*(Thor: You should have gotten the API Key comment when I submitted this in Canvas. Uncomment the API key located in `Locations.js line 220` and paste it after the `=` to replace where the call is made to PROCESS.env.REACT_APP_GOOGLE_KEY. I will be deleting the comment once you have finished grading).*
+*(Thor: You should have gotten the API Key comment when I submitted this in Canvas. Add those .env codes to get it to work. :)).*
 
 On this page, each card has its own Google Map that is zoomed in to the latitude/longitude provided. The map is updated upon changing the latitude of the first coordinate in the list if it contains more than one. The Google Map is showing the coordinates of the first coordinate in the list beneath the map.
 

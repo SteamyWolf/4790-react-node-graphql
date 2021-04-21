@@ -215,7 +215,7 @@ const Locations = () => {
                         <Card className={classes.card} key={location.id}>
                             <CardActionArea>
                                 <CardMedia>
-                                    <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`} //AIzaSyCAqXZDHtWTZ3lk8QqdL0ri-RKQhuzMs6U
+                                    <MapGoogle googleMapURL={`https:////maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`}
                                                location={location} 
                                                loadingElement={<div style={{ height: `100%` }} />}
                                                containerElement={<div style={{ height: `400px` }} />} 
