@@ -5,11 +5,10 @@ All of the scripts to run this project are located in the package.json file loca
 
 # To start this project you will run in your terminal the following commands:
 1. ## `npm install`
-2. ## `npm run postinstall`
-3. ## `npm run launch`
-4. ## `npm run migrate`
-5. ## `npm run seed`
-6. ## `npm run start-dev`
+2. ## `npm run launch`
+3. ## `npm run migrate`
+4. ## `npm run seed`
+5. ## `npm run start-dev`
 
 After doing so, you will see a window automatically open up in your default browser with the url being: `localhost:3000/locations`. This is the react app running locally.
 Another server running locally is `localhost:5050`. You will only see a 'Welcome' text displayed but this means it is working.
